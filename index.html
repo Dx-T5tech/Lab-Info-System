@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Information System — Design Package</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="dots">
+  <a href="#cover" class="active"><span>01 · cover</span></a>
+  <a href="#erd"><span>02 · er diagram</span></a>
+  <a href="#schema"><span>03 · schema</span></a>
+  <a href="#sql"><span>04 · sql script</span></a>
+  <a href="#index"><span>05 · index</span></a>
+</nav>
+
+<section id="cover">
+  <div class="cover-mark">LIS · DATABASE DESIGN PACKAGE</div>
+  <div class="cover-title">Lab Information<br>System</div>
+  <p class="cover-sub">Entity-relationship model, schema definition, and buildable SQL script for a clinical laboratory's order-to-result workflow.</p>
+  <div class="req-form">
+    <div class="req-form-head">REQUISITION · DESIGN PACKAGE SUMMARY</div>
+    <div class="req-grid">
+      <div class="req-cell"><div class="k">System</div><div class="v">Lab Information System (LIS)</div></div>
+      <div class="req-cell"><div class="k">Engine</div><div class="v">MySQL 8.0+ (InnoDB)</div></div>
+      <div class="req-cell"><div class="k">Entities</div><div class="v">8 tables</div></div>
+      <div class="req-cell"><div class="k">Core flow</div><div class="v">Order → specimen → result</div></div>
+    </div>
+  </div>
+  <div class="contents-list">
+    <span><b>02</b> ER diagram</span>
+    <span><b>03</b> Schema</span>
+    <span><b>04</b> SQL script</span>
+    <span><b>05</b> Index</span>
+  </div>
+</section>
+
+<section id="erd">
+  <div class="label-tag"><div class="bars"><span style="height:6px"></span><span style="height:10px"></span><span style="height:4px"></span><span style="height:9px"></span></div>LIS-02 / ERD</div>
+  <div class="eyebrow">02 — Entity-relationship diagram</div>
+  <h1 class="slide-title">ER diagram</h1>
+  <p class="slide-sub">Eight entities, cardinality marked on every connector. Reading order follows the lab workflow left to right: intake, ordering, collection, result.</p>
+  <div class="erd-wrap">
+    <img src="assets/diagram.svg" alt="Lab Information System entity-relationship diagram">
+  </div>
+  <div class="legend">
+    <span><b>1 : M</b> — one row relates to many</span>
+    <span><b>1 : 1</b> — one row relates to exactly one</span>
+  </div>
+</section>
+
+<section id="schema">
+  <div class="label-tag"><div class="bars"><span style="height:8px"></span><span style="height:5px"></span><span style="height:11px"></span><span style="height:6px"></span></div>LIS-03 / SCHEMA</div>
+  <div class="eyebrow">03 — Schema definition</div>
+  <h1 class="slide-title">Schema</h1>
+  <p class="slide-sub">Every table with its primary key, foreign keys, and remaining columns — the plain-language contract behind the SQL.</p>
+  <div class="schema-scroll">
+    <div class="schema-grid">
+      
+      <div class="schema-card">
+        <div class="schema-card-head">PATIENT</div>
+        <div class="row pk"><span class="tag">PK</span>patient_id</div>
+        
+        <div class="row"><span class="tag dim">—</span>first_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>last_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>date_of_birth DATE</div><div class="row"><span class="tag dim">—</span>gender ENUM</div><div class="row"><span class="tag dim">—</span>contact_number VARCHAR(20)</div><div class="row"><span class="tag dim">—</span>address VARCHAR(255)</div><div class="row"><span class="tag dim">—</span>email VARCHAR(100)</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">DOCTOR</div>
+        <div class="row pk"><span class="tag">PK</span>doctor_id</div>
+        
+        <div class="row"><span class="tag dim">—</span>first_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>last_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>specialization VARCHAR(100)</div><div class="row"><span class="tag dim">—</span>contact_number VARCHAR(20)</div><div class="row"><span class="tag dim">—</span>email VARCHAR(100)</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">STAFF</div>
+        <div class="row pk"><span class="tag">PK</span>staff_id</div>
+        
+        <div class="row"><span class="tag dim">—</span>first_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>last_name VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>role ENUM</div><div class="row"><span class="tag dim">—</span>contact_number VARCHAR(20)</div><div class="row"><span class="tag dim">—</span>username VARCHAR(50) UNIQUE</div><div class="row"><span class="tag dim">—</span>password_hash VARCHAR(255)</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">TEST_CATALOG</div>
+        <div class="row pk"><span class="tag">PK</span>test_id</div>
+        
+        <div class="row"><span class="tag dim">—</span>test_name VARCHAR(100)</div><div class="row"><span class="tag dim">—</span>test_category VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>specimen_type VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>price DECIMAL(10,2)</div><div class="row"><span class="tag dim">—</span>turnaround_hours INT</div><div class="row"><span class="tag dim">—</span>normal_range VARCHAR(100)</div><div class="row"><span class="tag dim">—</span>unit VARCHAR(20)</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">LAB_ORDER</div>
+        <div class="row pk"><span class="tag">PK</span>order_id</div>
+        <div class="row fk"><span class="tag">FK</span>patient_id → PATIENT</div><div class="row fk"><span class="tag">FK</span>doctor_id → DOCTOR</div>
+        <div class="row"><span class="tag dim">—</span>order_date DATETIME</div><div class="row"><span class="tag dim">—</span>status ENUM</div><div class="row"><span class="tag dim">—</span>priority ENUM</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">ORDER_TEST</div>
+        <div class="row pk"><span class="tag">PK</span>order_test_id</div>
+        <div class="row fk"><span class="tag">FK</span>order_id → LAB_ORDER</div><div class="row fk"><span class="tag">FK</span>test_id → TEST_CATALOG</div>
+        <div class="row"><span class="tag dim">—</span>status ENUM</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">SPECIMEN</div>
+        <div class="row pk"><span class="tag">PK</span>specimen_id</div>
+        <div class="row fk"><span class="tag">FK</span>order_test_id → ORDER_TEST (UNIQUE)</div><div class="row fk"><span class="tag">FK</span>collected_by → STAFF</div>
+        <div class="row"><span class="tag dim">—</span>specimen_type VARCHAR(50)</div><div class="row"><span class="tag dim">—</span>collection_date DATETIME</div><div class="row"><span class="tag dim">—</span>status ENUM</div>
+      </div>
+      <div class="schema-card">
+        <div class="schema-card-head">TEST_RESULT</div>
+        <div class="row pk"><span class="tag">PK</span>result_id</div>
+        <div class="row fk"><span class="tag">FK</span>specimen_id → SPECIMEN (UNIQUE)</div><div class="row fk"><span class="tag">FK</span>verified_by → STAFF</div>
+        <div class="row"><span class="tag dim">—</span>result_value VARCHAR(100)</div><div class="row"><span class="tag dim">—</span>unit VARCHAR(20)</div><div class="row"><span class="tag dim">—</span>reference_range VARCHAR(100)</div><div class="row"><span class="tag dim">—</span>flag ENUM</div><div class="row"><span class="tag dim">—</span>result_date DATETIME</div><div class="row"><span class="tag dim">—</span>remarks VARCHAR(255)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sql">
+  <div class="label-tag"><div class="bars"><span style="height:5px"></span><span style="height:12px"></span><span style="height:7px"></span><span style="height:4px"></span></div>LIS-04 / SQL</div>
+  <div class="eyebrow">04 — SQL script</div>
+  <h1 class="slide-title">SQL script</h1>
+  <p class="slide-sub">Full CREATE TABLE statements, constraints, indexes, and sample data — ready to run.</p>
+  <div class="sql-actions">
+    <a class="btn" download="lab_info_system.sql" href="assets/lab_info_system.sql">↓ Download .sql</a>
+    <button class="btn ghost" id="copyBtn">Copy to clipboard</button>
+  </div>
+  <div class="code-wrap"><pre id="sqlblock">-- ============================================================
+-- LAB INFORMATION SYSTEM (LIS) - DATABASE SCRIPT
+-- Engine: MySQL 8.0+ (InnoDB)
+-- ============================================================
+
+DROP DATABASE IF EXISTS lab_info_system;
+CREATE DATABASE lab_info_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE lab_info_system;
+
+-- ------------------------------------------------------------
+-- 1. PATIENT
+-- ------------------------------------------------------------
+CREATE TABLE patient (
+    patient_id      INT AUTO_INCREMENT PRIMARY KEY,
+    first_name      VARCHAR(50)  NOT NULL,
+    last_name       VARCHAR(50)  NOT NULL,
+    date_of_birth   DATE         NOT NULL,
+    gender          ENUM(&#x27;Male&#x27;,&#x27;Female&#x27;,&#x27;Other&#x27;) NOT NULL,
+    contact_number  VARCHAR(20),
+    address         VARCHAR(255),
+    email           VARCHAR(100),
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 2. DOCTOR
+-- ------------------------------------------------------------
+CREATE TABLE doctor (
+    doctor_id       INT AUTO_INCREMENT PRIMARY KEY,
+    first_name      VARCHAR(50)  NOT NULL,
+    last_name       VARCHAR(50)  NOT NULL,
+    specialization  VARCHAR(100),
+    contact_number  VARCHAR(20),
+    email           VARCHAR(100)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 3. STAFF (lab technicians, pathologists, admins, phlebotomists)
+-- ------------------------------------------------------------
+CREATE TABLE staff (
+    staff_id        INT AUTO_INCREMENT PRIMARY KEY,
+    first_name      VARCHAR(50)  NOT NULL,
+    last_name       VARCHAR(50)  NOT NULL,
+    role            ENUM(&#x27;Medtech&#x27;,&#x27;Pathologist&#x27;,&#x27;Admin&#x27;,&#x27;Phlebotomist&#x27;) NOT NULL,
+    contact_number  VARCHAR(20),
+    username        VARCHAR(50)  NOT NULL UNIQUE,
+    password_hash   VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 4. TEST_CATALOG (master list of tests the lab offers)
+-- ------------------------------------------------------------
+CREATE TABLE test_catalog (
+    test_id          INT AUTO_INCREMENT PRIMARY KEY,
+    test_name        VARCHAR(100) NOT NULL,
+    test_category    VARCHAR(50),
+    specimen_type    VARCHAR(50),
+    price            DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    turnaround_hours INT,
+    normal_range     VARCHAR(100),
+    unit             VARCHAR(20)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 5. LAB_ORDER (a physician&#x27;s request for a patient)
+-- ------------------------------------------------------------
+CREATE TABLE lab_order (
+    order_id     INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id   INT NOT NULL,
+    doctor_id    INT NOT NULL,
+    order_date   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status       ENUM(&#x27;Pending&#x27;,&#x27;In Progress&#x27;,&#x27;Completed&#x27;,&#x27;Cancelled&#x27;) DEFAULT &#x27;Pending&#x27;,
+    priority     ENUM(&#x27;Routine&#x27;,&#x27;Urgent&#x27;,&#x27;STAT&#x27;) DEFAULT &#x27;Routine&#x27;,
+    CONSTRAINT fk_order_patient FOREIGN KEY (patient_id) REFERENCES patient(patient_id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_order_doctor FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 6. ORDER_TEST (line items: which tests belong to which order)
+-- ------------------------------------------------------------
+CREATE TABLE order_test (
+    order_test_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id      INT NOT NULL,
+    test_id       INT NOT NULL,
+    status        ENUM(&#x27;Pending&#x27;,&#x27;Collected&#x27;,&#x27;Resulted&#x27;,&#x27;Verified&#x27;) DEFAULT &#x27;Pending&#x27;,
+    CONSTRAINT fk_ordertest_order FOREIGN KEY (order_id) REFERENCES lab_order(order_id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_ordertest_test FOREIGN KEY (test_id) REFERENCES test_catalog(test_id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT uq_order_test UNIQUE (order_id, test_id)
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 7. SPECIMEN (sample collected for one order_test line item)
+-- ------------------------------------------------------------
+CREATE TABLE specimen (
+    specimen_id      INT AUTO_INCREMENT PRIMARY KEY,
+    order_test_id    INT NOT NULL UNIQUE,
+    specimen_type    VARCHAR(50),
+    collection_date  DATETIME,
+    collected_by     INT,
+    status           ENUM(&#x27;Collected&#x27;,&#x27;Received&#x27;,&#x27;Rejected&#x27;) DEFAULT &#x27;Collected&#x27;,
+    CONSTRAINT fk_specimen_ordertest FOREIGN KEY (order_test_id) REFERENCES order_test(order_test_id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_specimen_staff FOREIGN KEY (collected_by) REFERENCES staff(staff_id)
+        ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- 8. TEST_RESULT (result for one specimen)
+-- ------------------------------------------------------------
+CREATE TABLE test_result (
+    result_id        INT AUTO_INCREMENT PRIMARY KEY,
+    specimen_id       INT NOT NULL UNIQUE,
+    result_value      VARCHAR(100),
+    unit              VARCHAR(20),
+    reference_range   VARCHAR(100),
+    flag              ENUM(&#x27;Normal&#x27;,&#x27;High&#x27;,&#x27;Low&#x27;,&#x27;Critical&#x27;) DEFAULT &#x27;Normal&#x27;,
+    result_date       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    verified_by       INT,
+    remarks           VARCHAR(255),
+    CONSTRAINT fk_result_specimen FOREIGN KEY (specimen_id) REFERENCES specimen(specimen_id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_result_staff FOREIGN KEY (verified_by) REFERENCES staff(staff_id)
+        ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- INDEXES (speed up common lookups beyond PK/FK auto-indexes)
+-- ------------------------------------------------------------
+CREATE INDEX idx_patient_name       ON patient (last_name, first_name);
+CREATE INDEX idx_order_status       ON lab_order (status);
+CREATE INDEX idx_order_date         ON lab_order (order_date);
+CREATE INDEX idx_ordertest_status   ON order_test (status);
+CREATE INDEX idx_result_flag        ON test_result (flag);
+
+-- ------------------------------------------------------------
+-- SAMPLE DATA
+-- ------------------------------------------------------------
+INSERT INTO patient (first_name, last_name, date_of_birth, gender, contact_number, address, email) VALUES
+(&#x27;Maria&#x27;, &#x27;Santos&#x27;, &#x27;1990-05-12&#x27;, &#x27;Female&#x27;, &#x27;09171234567&#x27;, &#x27;San Pablo, Laguna&#x27;, &#x27;maria.santos@email.com&#x27;),
+(&#x27;Juan&#x27;, &#x27;Dela Cruz&#x27;, &#x27;1985-11-23&#x27;, &#x27;Male&#x27;, &#x27;09281234567&#x27;, &#x27;Calamba, Laguna&#x27;, &#x27;juan.delacruz@email.com&#x27;);
+
+INSERT INTO doctor (first_name, last_name, specialization, contact_number, email) VALUES
+(&#x27;Ana&#x27;, &#x27;Reyes&#x27;, &#x27;Internal Medicine&#x27;, &#x27;09991234567&#x27;, &#x27;dr.reyes@clinic.com&#x27;),
+(&#x27;Carlos&#x27;, &#x27;Villanueva&#x27;, &#x27;Pathology&#x27;, &#x27;09881234567&#x27;, &#x27;dr.villanueva@clinic.com&#x27;);
+
+INSERT INTO staff (first_name, last_name, role, contact_number, username, password_hash) VALUES
+(&#x27;Liza&#x27;, &#x27;Ramos&#x27;, &#x27;Medtech&#x27;, &#x27;09171112222&#x27;, &#x27;lramos&#x27;, &#x27;hashed_password_1&#x27;),
+(&#x27;Mark&#x27;, &#x27;Torres&#x27;, &#x27;Phlebotomist&#x27;, &#x27;09281113333&#x27;, &#x27;mtorres&#x27;, &#x27;hashed_password_2&#x27;),
+(&#x27;Grace&#x27;, &#x27;Lim&#x27;, &#x27;Pathologist&#x27;, &#x27;09391114444&#x27;, &#x27;glim&#x27;, &#x27;hashed_password_3&#x27;);
+
+INSERT INTO test_catalog (test_name, test_category, specimen_type, price, turnaround_hours, normal_range, unit) VALUES
+(&#x27;Complete Blood Count&#x27;, &#x27;Hematology&#x27;, &#x27;Blood&#x27;, 350.00, 4, &#x27;4.5-11.0&#x27;, &#x27;x10^9/L&#x27;),
+(&#x27;Fasting Blood Sugar&#x27;, &#x27;Chemistry&#x27;, &#x27;Blood&#x27;, 150.00, 2, &#x27;70-100&#x27;, &#x27;mg/dL&#x27;),
+(&#x27;Urinalysis&#x27;, &#x27;Clinical Microscopy&#x27;, &#x27;Urine&#x27;, 120.00, 3, &#x27;Negative&#x27;, &#x27;qualitative&#x27;);
+
+INSERT INTO lab_order (patient_id, doctor_id, status, priority) VALUES
+(1, 1, &#x27;Pending&#x27;, &#x27;Routine&#x27;),
+(2, 2, &#x27;In Progress&#x27;, &#x27;Urgent&#x27;);
+
+INSERT INTO order_test (order_id, test_id, status) VALUES
+(1, 1, &#x27;Pending&#x27;),
+(1, 2, &#x27;Pending&#x27;),
+(2, 3, &#x27;Collected&#x27;);
+
+INSERT INTO specimen (order_test_id, specimen_type, collection_date, collected_by, status) VALUES
+(3, &#x27;Urine&#x27;, &#x27;2026-08-09 08:30:00&#x27;, 2, &#x27;Received&#x27;);
+
+INSERT INTO test_result (specimen_id, result_value, unit, reference_range, flag, verified_by, remarks) VALUES
+(1, &#x27;Negative&#x27;, &#x27;qualitative&#x27;, &#x27;Negative&#x27;, &#x27;Normal&#x27;, 3, &#x27;No abnormalities noted&#x27;);
+
+-- ------------------------------------------------------------
+-- SAMPLE QUERIES
+-- ------------------------------------------------------------
+-- All pending orders with patient and doctor names
+-- SELECT lo.order_id, p.first_name, p.last_name, d.first_name AS doctor_first, d.last_name AS doctor_last, lo.status
+-- FROM lab_order lo
+-- JOIN patient p ON lo.patient_id = p.patient_id
+-- JOIN doctor d ON lo.doctor_id = d.doctor_id
+-- WHERE lo.status = &#x27;Pending&#x27;;
+
+-- Full result report for a given order
+-- SELECT p.first_name, p.last_name, tc.test_name, tr.result_value, tr.unit, tr.flag
+-- FROM lab_order lo
+-- JOIN patient p ON lo.patient_id = p.patient_id
+-- JOIN order_test ot ON ot.order_id = lo.order_id
+-- JOIN test_catalog tc ON tc.test_id = ot.test_id
+-- JOIN specimen s ON s.order_test_id = ot.order_test_id
+-- JOIN test_result tr ON tr.specimen_id = s.specimen_id
+-- WHERE lo.order_id = 1;
+</pre></div>
+</section>
+
+<section id="index">
+  <div class="label-tag"><div class="bars"><span style="height:9px"></span><span style="height:6px"></span><span style="height:12px"></span><span style="height:5px"></span></div>LIS-05 / INDEX</div>
+  <div class="eyebrow">05 — Index</div>
+  <h1 class="slide-title">Why each part exists</h1>
+  <p class="slide-sub">What each section is used for, and why it was included in this package.</p>
+  <div class="index-scroll">
+    
+      <div class="index-item">
+        <div class="index-num">01</div>
+        <div class="index-body">
+          <div class="index-title">Cover material</div>
+          <p>Sets the scope up front — what system this is, what engine it targets, and what's included — so the package can be handed off without a verbal walkthrough.</p>
+        </div>
+      </div>
+      <div class="index-item">
+        <div class="index-num">02</div>
+        <div class="index-body">
+          <div class="index-title">ER diagram</div>
+          <p>Created first because every other artifact derives from it. It fixes the entities and cardinalities before a single CREATE TABLE is written, catching design mistakes while they're still cheap to change.</p>
+        </div>
+      </div>
+      <div class="index-item">
+        <div class="index-num">03</div>
+        <div class="index-body">
+          <div class="index-title">Schema table</div>
+          <p>Used as the bridge between the diagram and the code — a plain-language contract listing every column, type, and key so a reviewer can sanity-check the design without reading SQL.</p>
+        </div>
+      </div>
+      <div class="index-item">
+        <div class="index-num">04</div>
+        <div class="index-body">
+          <div class="index-title">SQL script</div>
+          <p>The buildable artifact. Everything above exists to justify what's in this file — it's the only piece that actually creates the database.</p>
+        </div>
+      </div>
+      <div class="index-item">
+        <div class="index-num">05</div>
+        <div class="index-body">
+          <div class="index-title">This index</div>
+          <p>Included because a design package without a rationale gets questioned later — this records why each part exists, not just what it contains.</p>
+        </div>
+      </div>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
