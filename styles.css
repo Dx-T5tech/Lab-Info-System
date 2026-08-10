@@ -73,7 +73,6 @@ h1.slide-title {
   max-width: 640px;
 }
 
-/* ---- NAV ---- */
 nav.dots {
   position: fixed;
   right: 26px;
@@ -197,7 +196,6 @@ nav.dots a:hover span { opacity: 1; }
 }
 .legend b { color: var(--teal); }
 
-/* ---- SCHEMA SLIDE ---- */
 .schema-scroll {
   flex: 1;
   overflow-y: auto;
@@ -239,7 +237,6 @@ nav.dots a:hover span { opacity: 1; }
 .row .tag.dim { color: var(--border); }
 .row.fk .tag { color: var(--amber); }
 
-/* ---- SQL SLIDE ---- */
 .sql-actions {
   display: flex;
   gap: 12px;
@@ -283,7 +280,6 @@ nav.dots a:hover span { opacity: 1; }
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
-/* ---- INDEX SLIDE ---- */
 .index-scroll { flex: 1; max-width: 780px; }
 .index-item {
   display: flex;
